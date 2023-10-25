@@ -1,6 +1,12 @@
 import json
 import streamlit as st
 
+def provide_raw_data(data: dict) -> None:
+    
+    with st.expander(label="Raw Data"):
+        st.json(data)
+    return
+
 
 def main():
     st.title("NFL-Predictor")
@@ -12,6 +18,12 @@ def main():
     
     st.selectbox(label="Home Team", options=raw_data["teams"], index=0)
     st.selectbox(label="Away Team", options=raw_data["teams"], index=1)
+    
+    provide_raw_data(data=raw_data)
+
+
+
+
 
     return
 
