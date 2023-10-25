@@ -96,6 +96,34 @@ def provide_decision_support(home_stats, away_stats, home_team, away_team):     
 
 
 
+#Level 5
+def provide_automated_decision(                            #Funktion zur automatischen Entscheidung in Level 5. Supportstatistik und Teams werden uebergeben
+    home_scoring_mean,
+    home_allowed_mean,
+    away_scoring_mean,
+    away_allowed_mean,
+    home_team,
+    away_team,
+):
+    with st.expander("Prediction"):                        #Expander in Streamlit "Prediction"
+        home_pred = (home_scoring_mean + away_allowed_mean) / 2 #Die vorhergesagte durchschnittliche Punktzahl des Heimteams wird berechnet.
+        away_pred = (away_scoring_mean + home_allowed_mean) / 2 #Die vorhergesagte durchschnittliche Punktzahl des Auswaertsteams wird berechnet.
+
+        spread_pred = home_pred - away_pred                 #Punkteunterschied wird vorhergesagt.
+
+        if spread_pred > 0:                                 #Wenn Punkteunterschied groesser Null gewinnt das Heimteam.
+            winner = home_team
+            spread_pred *= -1                                              
+
+        else:                                               #Sonst gewinnt das Auswaertsteam.
+            winner = away_team                              
+            spread_pred = spread_pred
+
+        st.success(f"{winner} wins with a handicap of {spread_pred} points.")   #Erfolgsmeldung mit Bekanntgabe des Gewinners wird erstellt.
+
+
+
+
 
 def main():                                                     #Main-Funktion.
     
@@ -120,9 +148,16 @@ def main():                                                     #Main-Funktion.
         away_allowed_mean,
     ) = provide_decision_support(home_stats, away_stats, home_team, away_team) #Funktion fuer Level 4. Uebergabe der Statistiken und Teams zur Entscheidungshilfe.
 
-
+    # Level 5
+    provide_automated_decision(                                 #Funktion fuer Level 5 = Automatisierte Entscheidung basierend auf dem Mittelwert der Teams. Teams und Mittelwerte werden uebergeben.
+        home_scoring_mean,
+        home_allowed_mean,
+        away_scoring_mean,
+        away_allowed_mean,
+        home_team,
+        away_team,
+    )
     return                                                      #Keine Rueckgabe von Variablen
-
 
 if __name__ == "__main__":                                      #Funktion stellt sicher, dass Main nur ausgefuert wird, wenn Skript direkt ausgefuehrt wird.
     main()
