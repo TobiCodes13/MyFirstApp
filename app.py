@@ -71,6 +71,32 @@ def provide_algorithm(raw_data_df):                         #Erzeugung Funktion 
 
 
 
+#Level 4
+def provide_decision_support(home_stats, away_stats, home_team, away_team):     #Funktion fuer Level 4. Unterstuetzung der Entscheidung. Uebergabe Teams und Statistiken.
+    
+    with st.expander("Metrics for Decision"):                                   #Expander Streamlit.
+        first_col, second_col = st.columns(2)                                   #Die Anzeige wird in zwei Spalten aufgeteilt.
+        home_scoring_rank = home_stats[home_stats.team == home_team].index[0]   #Die durchschnittliche erzielte Punktzahl des Heimteams wird aus den `home_stats` extrahiert.
+        home_scoring_mean = home_stats[home_stats["team"] == home_team]["points_scored"].values[0]
+        first_col.metric(label="Home Scoring Mean", value=home_scoring_mean)    #Ein Metrik-Widget wird erstellt, um die durchschnittliche erzielte Punktzahl des Heimteams anzuzeigen.
+
+        away_scoring_rank = away_stats[away_stats.team == away_team].index[0]   #Die durchschnittliche erzielte Punktzahl des Auswaertsteams wird aus den `away_stats` extrahiert.
+        away_scoring_mean = away_stats[away_stats["team"] == away_team]["points_scored"].values[0]
+        second_col.metric(label="Away Scoring Mean", value=away_scoring_mean)   #Metrik-Widget.
+
+        home_allowed_rank = home_stats[home_stats.team == home_team].index[0]   #Die durchschnittlich zugelassene Punktzahl des Heimteams wird aus den `home_stats` extrahiert.
+        home_allowed_mean = home_stats[home_stats["team"] == home_team]["points_allowed"].values[0]
+        first_col.metric(label="Home Allowed Mean", value=home_allowed_mean)    #Metrik-Widget.
+
+        away_allowed_rank = away_stats[away_stats.team == away_team].index[0]   #Die durchschnittlich zugelassene Punktzahl des Auswaertsteams wird aus den `away_stats` extrahiert.
+        away_allowed_mean = away_stats[away_stats["team"] == away_team]["points_allowed"].values[0]
+        second_col.metric(label="Away Allowed Mean", value=away_allowed_mean)   #Metrik-Widget.
+
+    return home_scoring_mean, home_allowed_mean, away_scoring_mean, away_allowed_mean #Die durchschnittlichen Punktzahlen fuer Heim- und Auswaertsteams werden zurueckgegeben.
+
+
+
+
 def main():                                                     #Main-Funktion.
     
     st.title("NFL-Predictor")                                   #Titel Streamlit = NFL-Predictor.
@@ -85,6 +111,14 @@ def main():                                                     #Main-Funktion.
 
     # Level 3
     provide_algorithm(raw_data_df=raw_data_df)                  #Funktion fuer Level 3 wird aufgerufen. Zur Vorhersage werden dem Algorithmus die Rohdaten uebergeben.
+
+    # Level 4
+    (
+        home_scoring_mean,
+        home_allowed_mean,
+        away_scoring_mean,
+        away_allowed_mean,
+    ) = provide_decision_support(home_stats, away_stats, home_team, away_team) #Funktion fuer Level 4. Uebergabe der Statistiken und Teams zur Entscheidungshilfe.
 
 
     return                                                      #Keine Rueckgabe von Variablen
