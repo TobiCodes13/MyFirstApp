@@ -5,8 +5,8 @@ import pandas as pd
 import requests
 
 URL = "http://127.0.0.1:8000"
-ENDPOINT_DATA = URL+"/data"
-ENDPOINT_TEAMS = URL+"/teams"
+ENDPOINT_DATA = URL+"/level-1/data"
+ENDPOINT_TEAMS = URL+"/level-1/teams"
 
 #Level 1
 def provide_raw_data():                                 #Definition Funktion "provide_raw_data". Path wird als Uebergabeparameter erwartet
@@ -20,30 +20,30 @@ def provide_raw_data():                                 #Definition Funktion "pr
     return            
 
 
-# #Level 2
-# def provide_derived_data(raw_data_df):                      #Funktion mit dem Namen "provide_derived_data". Erwartet den Pandas Data Frame "raw_data_df" als Uebergabe (Siehe provide_raw_data)
+#Level 2
+def provide_derived_data(raw_data_df):                      #Funktion mit dem Namen "provide_derived_data". Erwartet den Pandas Data Frame "raw_data_df" als Uebergabe (Siehe provide_raw_data)
     
-#      raw_data_df = pd.DataFrame(raw_data["games"])           #"games"-Daten werden raw_data in ein Pandas DataFrame (Liste) "raw_data_df" konvertiert
+     raw_data_df = pd.DataFrame(raw_data["games"])           #"games"-Daten werden raw_data in ein Pandas DataFrame (Liste) "raw_data_df" konvertiert
     
     
-#     with st.expander(label="Insights"):                     #Ein Expander in Streamlit wird erstellt und mit dem Label "Insights" versehen.
-#         st.subheader("Home Insights")                       #Ueberschrift fuer die Heimstatistiken wird hinzugefuegt.
-#         home_stats = raw_data_df.groupby("team")[["points_scored", "points_allowed"]].mean()    #Berechnung der durchschnittlichen Punkte erzielt/zugelassen.
-#         home_stats["team"] = home_stats.index               #Der Index (Heimteam) wird als eine neue Spalte hinzugefuegt.
-#         home_stats.sort_values("points_scored", ascending=False, inplace=True)  #Sortierung nach erzielten Punkten absteigend.
-#         home_stats.reset_index(drop=True, inplace=True)     #Index des DataFrames wird neu gesetzt und um 1 erhoeht.
-#         home_stats.index += 1
-#         st.write(home_stats)                                #Anzeige Heimstatistiken in Streamlit
+    with st.expander(label="Insights"):                     #Ein Expander in Streamlit wird erstellt und mit dem Label "Insights" versehen.
+        st.subheader("Home Insights")                       #Ueberschrift fuer die Heimstatistiken wird hinzugefuegt.
+        home_stats = raw_data_df.groupby("team")[["points_scored", "points_allowed"]].mean()    #Berechnung der durchschnittlichen Punkte erzielt/zugelassen.
+        home_stats["team"] = home_stats.index               #Der Index (Heimteam) wird als eine neue Spalte hinzugefuegt.
+        home_stats.sort_values("points_scored", ascending=False, inplace=True)  #Sortierung nach erzielten Punkten absteigend.
+        home_stats.reset_index(drop=True, inplace=True)     #Index des DataFrames wird neu gesetzt und um 1 erhoeht.
+        home_stats.index += 1
+        st.write(home_stats)                                #Anzeige Heimstatistiken in Streamlit
 
-#         st.subheader("Away Insights")                       #Ueberschrift fuer die Auswaertsstatistiken wird hinzugefuegt.
-#         away_stats = raw_data_df.groupby("opponent")[["points_scored", "points_allowed"]].mean()    #Berechnung der durchschnittlichen Punkte erzielt/zugelassen.
-#         away_stats["team"] = away_stats.index               #Der Index (Auswaertsteam) wird als eine neue Spalte hinzugefuegt.
-#         away_stats.sort_values("points_scored", ascending=False, inplace=True)  #Sortierung nach erzielten Punkten absteigend.
-#         away_stats.reset_index(drop=True, inplace=True)     #Index des DataFrames wird neu gesetzt und um 1 erhoeht.
-#         away_stats.index += 1
-#         st.write(away_stats)                                #Anzeige Auswaertsstatistiken in Streamlit.
+        st.subheader("Away Insights")                       #Ueberschrift fuer die Auswaertsstatistiken wird hinzugefuegt.
+        away_stats = raw_data_df.groupby("opponent")[["points_scored", "points_allowed"]].mean()    #Berechnung der durchschnittlichen Punkte erzielt/zugelassen.
+        away_stats["team"] = away_stats.index               #Der Index (Auswaertsteam) wird als eine neue Spalte hinzugefuegt.
+        away_stats.sort_values("points_scored", ascending=False, inplace=True)  #Sortierung nach erzielten Punkten absteigend.
+        away_stats.reset_index(drop=True, inplace=True)     #Index des DataFrames wird neu gesetzt und um 1 erhoeht.
+        away_stats.index += 1
+        st.write(away_stats)                                #Anzeige Auswaertsstatistiken in Streamlit.
 
-#     return home_stats, away_stats                           #Rueckgabe Heim- & Auswaertsstatistik
+    return home_stats, away_stats                           #Rueckgabe Heim- & Auswaertsstatistik
 
 
 #Level 3
