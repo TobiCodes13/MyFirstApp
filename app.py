@@ -6,6 +6,7 @@ import requests
 
 URL = "http://127.0.0.1:8000"
 ENDPOINT_DATA = URL+"/data"
+ENDPOINT_TEAMS = URL+"/teams"
 
 #Level 1
 def provide_raw_data():                                 #Definition Funktion "provide_raw_data". Path wird als Uebergabeparameter erwartet
@@ -45,57 +46,57 @@ def provide_raw_data():                                 #Definition Funktion "pr
 #     return home_stats, away_stats                           #Rueckgabe Heim- & Auswaertsstatistik
 
 
-# #Level 3
-# def provide_algorithm(raw_data_df):                         #Erzeugung Funktion zur Vorhersage. Uebergabe von Rohdaten
+#Level 3
+def provide_algorithm(raw_data_df):                         #Erzeugung Funktion zur Vorhersage. Uebergabe von Rohdaten
     
-#     with st.expander("Algorithm for Home Advantage"):       #Expander Streamlit
-#         st.markdown(                                        #Erklaerung zur Ermittlung der Vorhersage
-#             """
-#                     **Heimvorteil sind +3 Punkte im Handicap**  
-#                     *(Modellierte Annahme)*
+    with st.expander("Algorithm for Home Advantage"):       #Expander Streamlit
+        st.markdown(                                        #Erklaerung zur Ermittlung der Vorhersage
+            """
+                    **Heimvorteil sind +3 Punkte im Handicap**  
+                    *(Modellierte Annahme)*
                     
-#                     Erklärung:
-#                     Die Schätzung des Heimvorteils in der NFL auf ungefähr 2,5 bis 3 Punkte pro Spiel basiert auf einer Kombination von historischen Daten, Studien und Erfahrungen von Sportanalysten. Es ist wichtig zu beachten, dass dies eine allgemeine Schätzung ist und keine exakte wissenschaftliche Berechnung darstellt. Hier sind einige der Quellen und Grundlagen, auf denen diese Schätzung basiert:
-#                     - **Historische Daten:** Durch die Analyse von jahrzehntelangen NFL-Spielprotokollen können Sportanalysten Muster erkennen, die darauf hinweisen, dass Teams, die zu Hause spielen, tendenziell bessere Ergebnisse erzielen als bei Auswärtsspielen. Dies kann als Ausgangspunkt für die Schätzung des Heimvorteils dienen.
-#                     - **Akademische Studien:** Es gibt einige akademische Studien und wissenschaftliche Arbeiten, die den Heimvorteil im Sport, einschließlich der NFL, untersuchen. Diese Studien nutzen statistische Methoden, um den Heimvorteil zu quantifizieren. Obwohl die Ergebnisse variieren können, zeigen viele dieser Studien einen Heimvorteil von etwa 2,5 bis 3 Punkten pro Spiel.
-#                     - **Erfahrung von Sportanalysten:** Sportexperten und Analysten, die die NFL und andere Sportligen abdecken, bringen ihre Erfahrung und Einsichten in die Schätzung des Heimvorteils ein. Dies kann auf beobachteten Mustern und ihrer Kenntnis der Dynamik von Heim- und Auswärtsspielen basieren.
-#                     """
-#         )
+                    Erklärung:
+                    Die Schätzung des Heimvorteils in der NFL auf ungefähr 2,5 bis 3 Punkte pro Spiel basiert auf einer Kombination von historischen Daten, Studien und Erfahrungen von Sportanalysten. Es ist wichtig zu beachten, dass dies eine allgemeine Schätzung ist und keine exakte wissenschaftliche Berechnung darstellt. Hier sind einige der Quellen und Grundlagen, auf denen diese Schätzung basiert:
+                    - **Historische Daten:** Durch die Analyse von jahrzehntelangen NFL-Spielprotokollen können Sportanalysten Muster erkennen, die darauf hinweisen, dass Teams, die zu Hause spielen, tendenziell bessere Ergebnisse erzielen als bei Auswärtsspielen. Dies kann als Ausgangspunkt für die Schätzung des Heimvorteils dienen.
+                    - **Akademische Studien:** Es gibt einige akademische Studien und wissenschaftliche Arbeiten, die den Heimvorteil im Sport, einschließlich der NFL, untersuchen. Diese Studien nutzen statistische Methoden, um den Heimvorteil zu quantifizieren. Obwohl die Ergebnisse variieren können, zeigen viele dieser Studien einen Heimvorteil von etwa 2,5 bis 3 Punkten pro Spiel.
+                    - **Erfahrung von Sportanalysten:** Sportexperten und Analysten, die die NFL und andere Sportligen abdecken, bringen ihre Erfahrung und Einsichten in die Schätzung des Heimvorteils ein. Dies kann auf beobachteten Mustern und ihrer Kenntnis der Dynamik von Heim- und Auswärtsspielen basieren.
+                    """
+        )
 
-#         prepared_data_df = raw_data_df.copy()               #Kopie der Rohdaten wird erstellt um Originaldaten nicht zu veraendern.
+        prepared_data_df = raw_data_df.copy()               #Kopie der Rohdaten wird erstellt um Originaldaten nicht zu veraendern.
 
-#         condition_1 = raw_data_df["points_scored"] - raw_data_df["points_allowed"] > 3  #Ermittlung Spiele, bei denen Team mehr als 3 Pkt. Vorsprung hatte.
-#         condition_2 = raw_data_df["points_scored"] - raw_data_df["points_allowed"] < 0
+        condition_1 = raw_data_df["points_scored"] - raw_data_df["points_allowed"] > 3  #Ermittlung Spiele, bei denen Team mehr als 3 Pkt. Vorsprung hatte.
+        condition_2 = raw_data_df["points_scored"] - raw_data_df["points_allowed"] < 0
 
-#         prepared_data_df["true wins"] = condition_1 | condition_2   #Neue Spalte "true wins" die angibt, ob das Team das Spiel gewonnen hat (True) oder nicht (False).
+        prepared_data_df["true wins"] = condition_1 | condition_2   #Neue Spalte "true wins" die angibt, ob das Team das Spiel gewonnen hat (True) oder nicht (False).
 
-#         st.write(prepared_data_df)                          #DataFrame wird anzeigen.
-#     return
+        st.write(prepared_data_df)                          #DataFrame wird anzeigen.
+    return
 
 
 
-# #Level 4
-# def provide_decision_support(home_stats, away_stats, home_team, away_team):     #Funktion fuer Level 4. Unterstuetzung der Entscheidung. Uebergabe Teams und Statistiken.
+#Level 4
+def provide_decision_support(home_stats, away_stats, home_team, away_team):     #Funktion fuer Level 4. Unterstuetzung der Entscheidung. Uebergabe Teams und Statistiken.
     
-#     with st.expander("Metrics for Decision"):                                   #Expander Streamlit.
-#         first_col, second_col = st.columns(2)                                   #Die Anzeige wird in zwei Spalten aufgeteilt.
-#         home_scoring_rank = home_stats[home_stats.team == home_team].index[0]   #Die durchschnittliche erzielte Punktzahl des Heimteams wird aus den `home_stats` extrahiert.
-#         home_scoring_mean = home_stats[home_stats["team"] == home_team]["points_scored"].values[0]
-#         first_col.metric(label="Home Scoring Mean", value=home_scoring_mean)    #Ein Metrik-Widget wird erstellt, um die durchschnittliche erzielte Punktzahl des Heimteams anzuzeigen.
+    with st.expander("Metrics for Decision"):                                   #Expander Streamlit.
+        first_col, second_col = st.columns(2)                                   #Die Anzeige wird in zwei Spalten aufgeteilt.
+        home_scoring_rank = home_stats[home_stats.team == home_team].index[0]   #Die durchschnittliche erzielte Punktzahl des Heimteams wird aus den `home_stats` extrahiert.
+        home_scoring_mean = home_stats[home_stats["team"] == home_team]["points_scored"].values[0]
+        first_col.metric(label="Home Scoring Mean", value=home_scoring_mean)    #Ein Metrik-Widget wird erstellt, um die durchschnittliche erzielte Punktzahl des Heimteams anzuzeigen.
 
-#         away_scoring_rank = away_stats[away_stats.team == away_team].index[0]   #Die durchschnittliche erzielte Punktzahl des Auswaertsteams wird aus den `away_stats` extrahiert.
-#         away_scoring_mean = away_stats[away_stats["team"] == away_team]["points_scored"].values[0]
-#         second_col.metric(label="Away Scoring Mean", value=away_scoring_mean)   #Metrik-Widget.
+        away_scoring_rank = away_stats[away_stats.team == away_team].index[0]   #Die durchschnittliche erzielte Punktzahl des Auswaertsteams wird aus den `away_stats` extrahiert.
+        away_scoring_mean = away_stats[away_stats["team"] == away_team]["points_scored"].values[0]
+        second_col.metric(label="Away Scoring Mean", value=away_scoring_mean)   #Metrik-Widget.
 
-#         home_allowed_rank = home_stats[home_stats.team == home_team].index[0]   #Die durchschnittlich zugelassene Punktzahl des Heimteams wird aus den `home_stats` extrahiert.
-#         home_allowed_mean = home_stats[home_stats["team"] == home_team]["points_allowed"].values[0]
-#         first_col.metric(label="Home Allowed Mean", value=home_allowed_mean)    #Metrik-Widget.
+        home_allowed_rank = home_stats[home_stats.team == home_team].index[0]   #Die durchschnittlich zugelassene Punktzahl des Heimteams wird aus den `home_stats` extrahiert.
+        home_allowed_mean = home_stats[home_stats["team"] == home_team]["points_allowed"].values[0]
+        first_col.metric(label="Home Allowed Mean", value=home_allowed_mean)    #Metrik-Widget.
 
-#         away_allowed_rank = away_stats[away_stats.team == away_team].index[0]   #Die durchschnittlich zugelassene Punktzahl des Auswaertsteams wird aus den `away_stats` extrahiert.
-#         away_allowed_mean = away_stats[away_stats["team"] == away_team]["points_allowed"].values[0]
-#         second_col.metric(label="Away Allowed Mean", value=away_allowed_mean)   #Metrik-Widget.
+        away_allowed_rank = away_stats[away_stats.team == away_team].index[0]   #Die durchschnittlich zugelassene Punktzahl des Auswaertsteams wird aus den `away_stats` extrahiert.
+        away_allowed_mean = away_stats[away_stats["team"] == away_team]["points_allowed"].values[0]
+        second_col.metric(label="Away Allowed Mean", value=away_allowed_mean)   #Metrik-Widget.
 
-#     return home_scoring_mean, home_allowed_mean, away_scoring_mean, away_allowed_mean #Die durchschnittlichen Punktzahlen fuer Heim- und Auswaertsteams werden zurueckgegeben.
+    return home_scoring_mean, home_allowed_mean, away_scoring_mean, away_allowed_mean #Die durchschnittlichen Punktzahlen fuer Heim- und Auswaertsteams werden zurueckgegeben.
 
 
 
@@ -131,6 +132,13 @@ def provide_raw_data():                                 #Definition Funktion "pr
 def main():                                                     #Main-Funktion.
     
     st.title("NFL-Predictor")                                   #Titel Streamlit = NFL-Predictor.
+
+    response = requests.get(url=ENDPOINT_TEAMS)
+    print(response.json())
+    teams = response.json()
+    
+    home_team = st.selectbox(label="Home", options=teams, index=0)
+    away_team = st.selectbox(label="Away", options=teams, index=1)
 
     # Level 1
     provide_raw_data()       #Funktion fuer Level 1 wird aufgrufen

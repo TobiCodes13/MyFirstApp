@@ -11,4 +11,8 @@ async def get_data():
         data = json.load(raw_file)                  #Inhalt wird als json-File interpretiert und in Variabele data geladen
     return data
 
-
+@app.get("/teams")
+async def get_teams():
+    with open(file=PATH, mode="r") as raw_file:     #Funtion oeffnet Datei aus Path im Lesemodus (r). With schliesst Datei direkt nach der Ausfuehrung um Ressourcen zu schonen                         
+        data = json.load(raw_file)                  #Inhalt wird als json-File interpretiert und in Variabele data geladen
+    return data ["teams"]
