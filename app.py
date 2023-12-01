@@ -136,7 +136,6 @@ def main():                                                     #Main-Funktion.
     st.title("NFL-Predictor")                                   #Titel Streamlit = NFL-Predictor.
 
     response = requests.get(url=ENDPOINT_TEAMS)
-    print(response.json())
     teams = response.json()
     
     home_team = st.selectbox(label="Home", options=teams, index=0)
