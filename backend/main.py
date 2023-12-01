@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi import Depends
 import json
 import pandas as pd
 
@@ -38,5 +39,23 @@ async def get_stats(team_type: str = "team"):
     stats.index += 1
     
     return stats.to_json(orient="index")                #Umwandeln der Statistiken in ein JSON-Format mit Index-Orientierung
+
+#-------------------------------------------------------------------------
+
+@app.get("/level-3/algorithm")  #Definiert den API-Endpunkt für Level 3 (Algorithmus)
+async def get_algorithm():
+    
+    raw_data = FileHandler()                                    #Ruft die Funktion FileHandler auf, um die Daten zu laden
+    
+    raw_data_df = pd.DataFrame(raw_data["games"])               #Erstellt ein Pandas DataFrame aus dem "games"-Teil der Daten
+    
+    prepared_data_df = raw_data_df.copy()                       #Kopiert das DataFrame, um die Originaldaten nicht zu verändern
+
+    condition_1 = raw_data_df["points_scored"] - raw_data_df["points_allowed"] > 3  #Überprüft, ob das Team mehr als 3 Punkte Vorsprung hatte
+    condition_2 = raw_data_df["points_scored"] - raw_data_df["points_allowed"] < 0  #Überprüft, ob das Team weniger Punkte erzielt hat als der Gegner
+
+    prepared_data_df["true wins"] = condition_1 | condition_2   #Erzeugt eine neue Spalte "true_wins", die angibt, ob das Team das Spiel gewonnen hat (True) oder nicht (False).
+
+    return prepared_data_df.to_json(orient="index")             #Konvertiert das DataFrame in JSON und gibt es zurück
 
 #-------------------------------------------------------------------------
