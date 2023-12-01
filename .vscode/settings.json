@@ -1,0 +1,12 @@
+{
+    "editor.fontSize": 10,
+    "editor.tabSize": 3,
+    "editor.accessibilityPageSize": 10,
+    "editor.scrollbar.horizontalScrollbarSize": 8,
+    "editor.scrollbar.verticalScrollbarSize": 8,
+    "workbench.editor.pinnedTabSizing": "compact",
+    "scm.inputFontSize": 10,
+    "terminal.integrated.fontSize": 11,
+    "markdown.preview.fontSize": 10,
+    "chat.editor.fontSize": 10
+}
