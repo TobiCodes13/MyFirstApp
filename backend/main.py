@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi import Depends
 import json
 import pandas as pd
+import requests
+from fastapi import Depends, HTTPException
 
 PATH = "data/nfl_data.json"   #Pfad zur JSON-Datei
 
@@ -13,6 +15,7 @@ def FileHandler():            #Funktion zum Lesen der JSON-Datei und Laden der D
     return data
 
 #-------------------------------------------------------------------------
+#Level 1
 
 @app.get("/level-1/data")       #FastAPI-Endpunkt zum Abrufen der gesamten Daten
 async def get_data():
@@ -24,6 +27,7 @@ async def get_teams():
     return data ["teams"]
 
 #-------------------------------------------------------------------------
+#Level 2
 
 @app.get("/level-2/stats")      #FastAPI-Endpunkt zum Abrufen von Statistiken basierend auf dem übergebenen 'team_type'
 async def get_stats(team_type: str = "team"):
@@ -41,6 +45,7 @@ async def get_stats(team_type: str = "team"):
     return stats.to_json(orient="index")                #Umwandeln der Statistiken in ein JSON-Format mit Index-Orientierung
 
 #-------------------------------------------------------------------------
+#Level 3
 
 @app.get("/level-3/algorithm")  #Definiert den API-Endpunkt für Level 3 (Algorithmus)
 async def get_algorithm():
@@ -59,3 +64,23 @@ async def get_algorithm():
     return prepared_data_df.to_json(orient="index")             #Konvertiert das DataFrame in JSON und gibt es zurück
 
 #-------------------------------------------------------------------------
+# Level 4
+
+@app.get("/level-4/decision-support")
+async def get_decision_support(home_team: str, away_team: str):
+    
+    raw_data = FileHandler()
+
+    raw_data_df = pd.DataFrame(raw_data["games"])
+
+    # Modify the column names based on your actual data
+    decision_support_df = raw_data_df.groupby("team")[["points_scored", "points_allowed"]].mean()
+    decision_support_df["team"] = decision_support_df.index
+    decision_support_df.sort_values("points_scored", ascending=False, inplace=True)
+    decision_support_df.reset_index(drop=True, inplace=True)
+    decision_support_df.index += 1
+
+    return decision_support_df.to_json(orient="index")
+
+#-------------------------------------------------------------------------
+
