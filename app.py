@@ -11,6 +11,7 @@ ENDPOINT_DATA = URL+"/level-1/data"
 ENDPOINT_TEAMS = URL+"/level-1/teams"
 ENDPOINT_STATS = URL+"/level-2/stats"
 ENDPOINT_ALGORITHM = URL+"/level-3/algorithm" 
+ENDPOINT_DECISION_SUPPORT = URL+"/level-4/decision-support"
 
 #-------------------------------------------------------------------------
 #Level 1
@@ -48,7 +49,7 @@ def provide_derived_data():
             st.write(df)                                            #Anzeige des DataFrames in Streamlit
     return                           
 
-
+#-------------------------------------------------------------------------
 #Level 3
 def provide_algorithm():                         
     
@@ -75,33 +76,35 @@ def provide_algorithm():
         
     return
 
+#-------------------------------------------------------------------------
+#Level 4
 
+def provide_decision_support(home_team, away_team):
+    # Make sure to pass home_team and away_team as query parameters
+    response = requests.get(url=ENDPOINT_DECISION_SUPPORT, params={"home_team": home_team, "away_team": away_team})
+    decision_support_data = response.json()  # Parse the JSON response
 
-# #Level 4
-# def provide_decision_support(home_stats, away_stats, home_team, away_team):     #Funktion fuer Level 4. Unterstuetzung der Entscheidung. Uebergabe Teams und Statistiken.
+    # Check if the data is a string, and convert it to a dictionary
+    if isinstance(decision_support_data, str):
+        decision_support_data = json.loads(decision_support_data)
+
+    decision_support_df = pd.DataFrame.from_dict(decision_support_data, orient="index")
+
+    # Reset the index to default integer index
+    decision_support_df.reset_index(drop=True, inplace=True)
+
+    with st.expander("Metrics for Decision"):
+        st.subheader("Home Team Metrics")
+        st.metric(label="Home Scoring Mean", value=decision_support_df.loc[0, "points_scored"])
+        st.metric(label="Home Allowed Mean", value=decision_support_df.loc[0, "points_allowed"])
+
+        st.subheader("Away Team Metrics")
+        st.metric(label="Away Scoring Mean", value=decision_support_df.loc[1, "points_scored"])
+        st.metric(label="Away Allowed Mean", value=decision_support_df.loc[1, "points_allowed"])
     
-#     with st.expander("Metrics for Decision"):                                   #Expander Streamlit.
-#         first_col, second_col = st.columns(2)                                   #Die Anzeige wird in zwei Spalten aufgeteilt.
-#         home_scoring_rank = home_stats[home_stats.team == home_team].index[0]   #Die durchschnittliche erzielte Punktzahl des Heimteams wird aus den `home_stats` extrahiert.
-#         home_scoring_mean = home_stats[home_stats["team"] == home_team]["points_scored"].values[0]
-#         first_col.metric(label="Home Scoring Mean", value=home_scoring_mean)    #Ein Metrik-Widget wird erstellt, um die durchschnittliche erzielte Punktzahl des Heimteams anzuzeigen.
+    return
 
-#         away_scoring_rank = away_stats[away_stats.team == away_team].index[0]   #Die durchschnittliche erzielte Punktzahl des Auswaertsteams wird aus den `away_stats` extrahiert.
-#         away_scoring_mean = away_stats[away_stats["team"] == away_team]["points_scored"].values[0]
-#         second_col.metric(label="Away Scoring Mean", value=away_scoring_mean)   #Metrik-Widget.
-
-#         home_allowed_rank = home_stats[home_stats.team == home_team].index[0]   #Die durchschnittlich zugelassene Punktzahl des Heimteams wird aus den `home_stats` extrahiert.
-#         home_allowed_mean = home_stats[home_stats["team"] == home_team]["points_allowed"].values[0]
-#         first_col.metric(label="Home Allowed Mean", value=home_allowed_mean)    #Metrik-Widget.
-
-#         away_allowed_rank = away_stats[away_stats.team == away_team].index[0]   #Die durchschnittlich zugelassene Punktzahl des Auswaertsteams wird aus den `away_stats` extrahiert.
-#         away_allowed_mean = away_stats[away_stats["team"] == away_team]["points_allowed"].values[0]
-#         second_col.metric(label="Away Allowed Mean", value=away_allowed_mean)   #Metrik-Widget.
-
-#     return home_scoring_mean, home_allowed_mean, away_scoring_mean, away_allowed_mean #Die durchschnittlichen Punktzahlen fuer Heim- und Auswaertsteams werden zurueckgegeben.
-
-
-
+#-------------------------------------------------------------------------
 # #Level 5
 # def provide_automated_decision(                            #Funktion zur automatischen Entscheidung in Level 5. Supportstatistik und Teams werden uebergeben
     # home_scoring_mean,
@@ -127,36 +130,31 @@ def provide_algorithm():
 
 #         st.success(f"{winner} wins with a handicap of {spread_pred} points.")   #Erfolgsmeldung mit Bekanntgabe des Gewinners wird erstellt.
 
-
-
+def fetch_teams():
+    response = requests.get(url=ENDPOINT_TEAMS)
+    return response.json()
 
 
 def main():                                                     #Main-Funktion.
     
-    st.title("NFL-Predictor")                                   #Titel Streamlit = NFL-Predictor.
+    st.title("NFL-Predictor")
 
-    response = requests.get(url=ENDPOINT_TEAMS)
-    teams = response.json()
-    
+    teams = fetch_teams()
+
     home_team = st.selectbox(label="Home", options=teams, index=0)
     away_team = st.selectbox(label="Away", options=teams, index=1)
 
     # Level 1
-    provide_raw_data()       #Funktion fuer Level 1 wird aufgrufen
+    provide_raw_data()
 
     # Level 2
-    provide_derived_data()   #Funktion fuer Level 2 wird aufgerufen
+    provide_derived_data()
 
     # Level 3
-    provide_algorithm()      #Funktion fuer Level 3 wird aufgerufen
+    provide_algorithm()
 
-    # # Level 4
-    # (
-    #     home_scoring_mean,
-    #     home_allowed_mean,
-    #     away_scoring_mean,
-    #     away_allowed_mean,
-    # ) = provide_decision_support(home_stats, away_stats, home_team, away_team) #Funktion fuer Level 4. Uebergabe der Statistiken und Teams zur Entscheidungshilfe.
+    # Level 4
+    provide_decision_support(home_team, away_team) 
 
     # # Level 5
     # provide_automated_decision(                                 #Funktion fuer Level 5 = Automatisierte Entscheidung basierend auf dem Mittelwert der Teams. Teams und Mittelwerte werden uebergeben.
@@ -171,3 +169,5 @@ def main():                                                     #Main-Funktion.
 
 if __name__ == "__main__":                                      #Funktion stellt sicher, dass Main nur ausgefuert wird, wenn Skript direkt ausgefuehrt wird.
     main()
+
+
