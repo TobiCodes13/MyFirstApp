@@ -83,4 +83,22 @@ async def get_decision_support(home_team: str, away_team: str):
     return decision_support_df.to_json(orient="index")
 
 #-------------------------------------------------------------------------
+#Level 5
 
+@app.get("/level-5/automated-decision")
+async def get_automated_decision(
+    home_team: str,
+    away_team: str,
+    home_scoring_mean: float,
+    home_allowed_mean: float,
+    away_scoring_mean: float,
+    away_allowed_mean: float,
+):
+    home_pred = (home_scoring_mean + away_allowed_mean) / 2
+    away_pred = (away_scoring_mean + home_allowed_mean) / 2
+
+    spread_pred = home_pred - away_pred
+
+    winner = home_team if spread_pred > 0 else away_team
+
+    return {"winner": winner, "spread_pred": spread_pred}

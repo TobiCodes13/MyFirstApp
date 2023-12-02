@@ -12,6 +12,7 @@ ENDPOINT_TEAMS = URL+"/level-1/teams"
 ENDPOINT_STATS = URL+"/level-2/stats"
 ENDPOINT_ALGORITHM = URL+"/level-3/algorithm" 
 ENDPOINT_DECISION_SUPPORT = URL+"/level-4/decision-support"
+ENDPOINT_AUTOMATED_DECISION = URL+"/level-5/automated-decision"
 
 #-------------------------------------------------------------------------
 #Level 1
@@ -105,30 +106,43 @@ def provide_decision_support(home_team, away_team):
     return
 
 #-------------------------------------------------------------------------
-# #Level 5
-# def provide_automated_decision(                            #Funktion zur automatischen Entscheidung in Level 5. Supportstatistik und Teams werden uebergeben
-    # home_scoring_mean,
-    # home_allowed_mean,
-    # away_scoring_mean,
-    # away_allowed_mean,
-    # home_team,
-    # away_team,'
-# ):
-#     with st.expander("Prediction"):                        #Expander in Streamlit "Prediction"
-#         home_pred = (home_scoring_mean + away_allowed_mean) / 2 #Die vorhergesagte durchschnittliche Punktzahl des Heimteams wird berechnet.
-#         away_pred = (away_scoring_mean + home_allowed_mean) / 2 #Die vorhergesagte durchschnittliche Punktzahl des Auswaertsteams wird berechnet.
+#Level 5
 
-#         spread_pred = home_pred - away_pred                 #Punkteunterschied wird vorhergesagt.
+def provide_automated_decision(home_team, away_team):
+    
+    response = requests.get(url=ENDPOINT_DECISION_SUPPORT,params={"home_team": home_team,"away_team": away_team,},)
+    decision_support_data = response.json()
 
-#         if spread_pred > 0:                                 #Wenn Punkteunterschied groesser Null gewinnt das Heimteam.
-#             winner = home_team
-#             spread_pred *= -1                                              
+    if isinstance(decision_support_data, str):
+        decision_support_data = json.loads(decision_support_data)
 
-#         else:                                               #Sonst gewinnt das Auswaertsteam.
-#             winner = away_team                              
-#             spread_pred = spread_pred
+    decision_support_df = pd.DataFrame.from_dict(decision_support_data, orient="index")
 
-#         st.success(f"{winner} wins with a handicap of {spread_pred} points.")   #Erfolgsmeldung mit Bekanntgabe des Gewinners wird erstellt.
+    # Reset the index to default integer index
+    decision_support_df.reset_index(drop=True, inplace=True)
+
+    home_scoring_mean = decision_support_df.loc[0, "points_scored"]
+    home_allowed_mean = decision_support_df.loc[0, "points_allowed"]
+    away_scoring_mean = decision_support_df.loc[1, "points_scored"]
+    away_allowed_mean = decision_support_df.loc[1, "points_allowed"]
+
+    response = requests.get(
+        url=ENDPOINT_AUTOMATED_DECISION,
+        params={
+            "home_team": home_team,
+            "away_team": away_team,
+            "home_scoring_mean": home_scoring_mean,
+            "home_allowed_mean": home_allowed_mean,
+            "away_scoring_mean": away_scoring_mean,
+            "away_allowed_mean": away_allowed_mean,
+        },
+    )
+    automated_decision_data = response.json()
+
+    st.subheader("Automated Decision")
+    st.success(f"{automated_decision_data['winner']} wins with a handicap of {automated_decision_data['spread_pred']} points.")
+
+    return
 
 def fetch_teams():
     response = requests.get(url=ENDPOINT_TEAMS)
@@ -157,14 +171,8 @@ def main():                                                     #Main-Funktion.
     provide_decision_support(home_team, away_team) 
 
     # # Level 5
-    # provide_automated_decision(                                 #Funktion fuer Level 5 = Automatisierte Entscheidung basierend auf dem Mittelwert der Teams. Teams und Mittelwerte werden uebergeben.
-    #     home_scoring_mean,
-    #     home_allowed_mean,
-    #     away_scoring_mean,
-    #     away_allowed_mean,
-    #     home_team,
-    #     away_team,
-    # )
+    provide_automated_decision(home_team, away_team)
+    
     return                                                      #Keine Rueckgabe von Variablen
 
 if __name__ == "__main__":                                      #Funktion stellt sicher, dass Main nur ausgefuert wird, wenn Skript direkt ausgefuehrt wird.
