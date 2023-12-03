@@ -6,7 +6,8 @@ import pandas as pd
 import requests
 
 #URL und Endpunkte für die API
-URL = "http://127.0.0.1:8000"
+#URL = "http://127.0.0.1:8000"
+URL = "http://172.17.0.1:8000"
 ENDPOINT_DATA = URL+"/level-1/data"
 ENDPOINT_TEAMS = URL+"/level-1/teams"
 ENDPOINT_STATS = URL+"/level-2/stats"
