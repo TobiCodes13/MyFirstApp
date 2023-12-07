@@ -1,4 +1,5 @@
 
+import json
 from bs4 import BeautifulSoup
 from requests import Session, RequestException
 from rich import print
@@ -6,6 +7,7 @@ from rich import print
 URL = "https://www.pro-football-reference.com"
 BOX_URL = URL+"/boxscores/"
 HEADERS = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"}
+OUTPUT_FILE = "season_links.json"
 
 def request_url(session: Session, url: str, retries:int = 3, timeout: int=10):
    for _ in range(retries):
@@ -55,7 +57,12 @@ def transform_to_season_boxscore_links_dict(session: Session, week_links:list) -
       season_boxscore_links[week_key] = boxscore_links
    
    return season_boxscore_links
-   
+  
+def load_to_json_file(path: str, data: dict) ->None:
+   with open(path, "w") as file:
+      json.dump(data, file)
+   return
+
 def main():
    http_session = Session()
    html = request_url(session=http_session, url=BOX_URL)
@@ -66,7 +73,7 @@ def main():
    
    season_boxscore_links = transform_to_season_boxscore_links_dict(session=http_session, week_links=week_links)
 
-   print(season_boxscore_links)
+   load_to_json_file(path=OUTPUT_FILE, data=season_boxscore_links)
   
  
 
