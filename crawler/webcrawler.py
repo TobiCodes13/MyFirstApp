@@ -1,13 +1,13 @@
 
 from bs4 import BeautifulSoup
 from requests import Session, RequestException
-
+from rich import print
 
 URL = "https://www.pro-football-reference.com"
 BOX_URL = URL+"/boxscores/"
 HEADERS = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"}
 
-def requests_url(session: Session, url: str, retries:int = 3, timeout: int=10):
+def request_url(session: Session, url: str, retries:int = 3, timeout: int=10):
    for _ in range(retries):
       try:
          response = session.get(url=url, timeout=timeout, headers=HEADERS)
@@ -34,15 +34,39 @@ def extract_boxscore_links(soup: BeautifulSoup) -> list:
    
    return [URL+link['href'] for link in links]
 
+def create_week_links(key: str) -> list:
+   season, week, current_week_no = key.split("/")
+   week_links = list()
+   
+   for week_no in range(int(current_week_no), 0, -1):
+      week_link = f"{URL}/years/{season}/week_{week_no}.htm"
+      week_links.append(week_link)
+      
+   return week_links
+
+def transform_to_season_boxscore_links_dict(session: Session, week_links:list) -> dict:
+   season_boxscore_links = dict()
+   
+   for week_link in week_links:
+      week_key = "".join(week_link.split(".")[2].split("/")[-2:])
+      html = request_url(session=session, url=week_link)
+      soup = parse_html_to_soup(html=html)
+      boxscore_links = extract_boxscore_links(soup=soup)
+      season_boxscore_links[week_key] = boxscore_links
+   
+   return season_boxscore_links
+   
 def main():
    http_session = Session()
-   html = requests_url(session=http_session, url=BOX_URL)
+   html = request_url(session=http_session, url=BOX_URL)
    soup = parse_html_to_soup(html)
    
    key = extract_current_week_info(soup=soup)
-   boxscore_links = extract_boxscore_links(soup=soup)
+   week_links = create_week_links(key)
    
-   print(boxscore_links)
+   season_boxscore_links = transform_to_season_boxscore_links_dict(session=http_session, week_links=week_links)
+
+   print(season_boxscore_links)
   
  
 
